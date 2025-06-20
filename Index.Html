@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಉಚಿತ ಕನ್ನಡ ಟೆಕ್ಸ್ಟ್-ಟು-ಸ್ಪೀಚ್</title>
+    <style>
+        body {
+            font-family: 'Noto Sans Kannada', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #006400;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #006400;
+            border-radius: 5px;
+        }
+        button {
+            background: #006400;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #004d00;
+        }
+        #voiceInfo {
+            margin: 10px 0;
+            color: #555;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>ಉಚಿತ ಕನ್ನಡ ಟೆಕ್ಸ್ಟ್-ಟು-ಸ್ಪೀಚ್</h1>
+    <textarea id="kannadaText" placeholder="ಇಲ್ಲಿ ಕನ್ನಡ ಪಠ್ಯವನ್ನು ನಮೂದಿಸಿ..."></textarea>
+    <div>
+        <button id="speakBtn">ಮಾತನಾಡಿಸು</button>
+        <button id="stopBtn">ನಿಲ್ಲಿಸು</button>
+    </div>
+    <div id="voiceInfo">ಸ್ವರ: ಲಭ್ಯವಾದಂತೆ</div>
+
+    <script>
+        const textInput = document.getElementById("kannadaText");
+        const speakBtn = document.getElementById("speakBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const voiceInfo = document.getElementById("voiceInfo");
+
+        // Check if browser supports TTS
+        if (!window.speechSynthesis) {
+            voiceInfo.textContent = "ನಿಮ್ಮ ಬ್ರೌಸರ್ ಟೆಕ್ಸ್ಟ್-ಟು-ಸ್ಪೀಚ್ ಅನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ!";
+            speakBtn.disabled = true;
+        }
+
+        // Load available voices
+        let voices = [];
+        speechSynthesis.onvoiceschanged = () => {
+            voices = speechSynthesis.getVoices();
+            const kannadaVoice = voices.find(voice => voice.lang.includes("kn"));
+            if (kannadaVoice) {
+                voiceInfo.textContent = `ಸ್ವರ: ${kannadaVoice.name} (ಕನ್ನಡ)`;
+            } else {
+                voiceInfo.textContent = "ಕನ್ನಡ ಸ್ವರ ಲಭ್ಯವಿಲ್ಲ. ಡೀಫಾಲ್ಟ್ ಸ್ವರ ಬಳಸಲಾಗುತ್ತಿದೆ.";
+            }
+        };
+
+        // Speak function
+        speakBtn.addEventListener("click", () => {
+            const text = textInput.value.trim();
+            if (!text) return;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            const kannadaVoice = voices.find(voice => voice.lang.includes("kn"));
+            
+            if (kannadaVoice) {
+                utterance.voice = kannadaVoice;
+                utterance.lang = "kn-IN"; // Kannada (India)
+            }
+
+            window.speechSynthesis.speak(utterance);
+        });
+
+        // Stop function
+        stopBtn.addEventListener("click", () => {
+            window.speechSynthesis.cancel();
+        });
+    </script>
+</body>
+</html>
